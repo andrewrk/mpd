@@ -525,8 +525,13 @@ ffmpeg_decode(struct decoder *decoder, struct input_stream *input)
 	decoder_initialized(decoder, &audio_format,
 			    input->seekable, total_time);
 
+#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51,5,0)
 	AVDictionaryEntry *entry =
 		av_dict_get(format_context->metadata, "replaygain_track_gain", NULL, 0);
+#else
+	AVMetadataTag *entry =
+        av_metadata_get(format_context->metadata, "replaygain_track_gain", 0, 0);
+#endif
 	if (entry != NULL)
 		g_printerr("replaygain_track_gain=%s\n", entry->value);
 
